@@ -37,9 +37,11 @@ const genericCommandMatcher = /(?<prefix>(?:^|^[\s\n\t\r]+)\/(?:[\s\n\t\r]*)|(?<
 bot.onText(genericCommandMatcher, (msg, match) => {
   console.log(match.groups.command)
   
-  const command = match.groups.command
+  let command = match.groups.command
   const params = match.groups.arguments.split(" ")
   const chatId = msg.chat.id
+
+  command = Object.keys(util).find(element => element.toLowerCase() === command.toLowerCase())
 
   if (!(command in util)) {
     return
