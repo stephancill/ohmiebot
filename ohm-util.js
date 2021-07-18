@@ -1,4 +1,6 @@
 const {ethers} = require("ethers")
+const helpers = require("./helpers")
+
 const LPABI = require("./abi/dai-ohm-lp.json")
 const sOHMABI = require("./abi/sohm.json")
 const stakingABI = require("./abi/staking-contract.json")
@@ -51,6 +53,18 @@ async function getOhmPrice() {
   }
 }
 
+async function getOhmBalance(address) {
+  const balance = await getBalance(address, sOHMAddress)
+  return balance / Math.pow(10, 9)
+}
+
+async function timeUntilRebase() {
+  const currentBlock = await provider.getBlockNumber()
+  const rebaseBlock = helpers.getRebaseBlock(currentBlock)
+  const seconds = helpers.secondsUntilBlock(currentBlock, rebaseBlock)
+  return helpers.prettifySeconds(seconds)
+}
+
 async function getStakedOhmEthValue(address) {
   const ohmQuote = await getQuoteFromLP("0x34d7d7Aaf50AD4944B70B320aCB24C95fa2def7c")
   const ethQuote = await getQuoteFromLP("0xc3d03e4f041fd4cd388c549ee2a29a9e5075882f")
@@ -68,7 +82,7 @@ async function main() {
   
 }
 
-module.exports = {getStakedOhmEthValue, getStakingStats, getOhmPrice}
+module.exports = {getStakedOhmEthValue, getStakingStats, getOhmPrice, getOhmBalance, timeUntilRebase}
 
 // main()
 //   .then(() => process.exit(0))

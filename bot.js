@@ -1,6 +1,6 @@
 require("dotenv").config()
 const TelegramBot = require("node-telegram-bot-api")
-const util = require("./util")
+const util = require("./ohm-util")
 
 const botOptions = (process.env.DEBUG || "").toLowerCase() === "true" ? {
   polling: true
@@ -43,9 +43,12 @@ bot.onText(genericCommandMatcher, (msg, match) => {
 
   command = Object.keys(util).find(element => element.toLowerCase() === command.toLowerCase())
 
-  if (!(command in util)) {
+  if (match.groups.command.toLowerCase() === "help") {
+    bot.sendMessage(chatId, Object.keys(util).join(", "))
     return
-  }
+  } else if (!(command in util)) {
+    return
+  } 
 
   const processingPromise = bot.sendMessage(chatId, "Processing...")
 
