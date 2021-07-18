@@ -20,7 +20,12 @@ const token = process.env.BOT_TOKEN
 const url = process.env.APP_URL;
 const bot = new TelegramBot(token, botOptions)
 
-bot.setWebHook(`${url}/bot${token}`)
+bot.deleteWebHook().then(() => {
+  bot.setWebHook(`${url}/bot${token}`).then(e => {
+    console.log(e)
+  })
+})
+
 
 function deleteProcessingMessage(chatId, messagePromise) {
   messagePromise.then(m => {
