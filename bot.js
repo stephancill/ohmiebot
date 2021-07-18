@@ -2,8 +2,25 @@ require("dotenv").config()
 const TelegramBot = require("node-telegram-bot-api")
 const util = require("./util")
 
+const botOptions = process.env.DEBUG.toLowerCase() === "true" ? {
+  polling: true
+} : {
+  webHook: {
+    port: process.env.PORT,
+  }
+}
+
+if (botOptions.polling) {
+  console.log("Polling")
+} else {
+  console.log("Webhook")
+}
+
 const token = process.env.BOT_TOKEN
-const bot = new TelegramBot(token, {polling: true})
+const url = process.env.APP_URL;
+const bot = new TelegramBot(token, botOptions)
+
+bot.setWebHook(`${url}/bot${token}`)
 
 const genericCommandMatcher = /(?<prefix>(?:^|^[\s\n\t\r]+)\/(?:[\s\n\t\r]*)|(?<=[\s\n\t\r])\.:(?:[\s\n\t\r]*)|(?<=[\s\n\t\r])::(?:[\s\n\t\r]*))(?<command>[a-zA-Z0-9]+)(?:[\s\n\t\r]*)(?<arguments>[^]*?(?=(?<=[\s\n\t\r])\.:|(?<=[\s\n\t\r])::|$))/
 bot.onText(genericCommandMatcher, (msg, match) => {
