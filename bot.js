@@ -1,4 +1,5 @@
 require("dotenv").config()
+const replaceAll = require('string.prototype.replaceall')
 const TelegramBot = require("node-telegram-bot-api")
 const util = require("./ohm-util")
 
@@ -10,22 +11,20 @@ const botOptions = (process.env.DEBUG || "").toLowerCase() === "true" ? {
   }
 }
 
-if (botOptions.polling) {
-  console.log("Polling")
-} else {
-  console.log("Webhook")
-}
-
 const token = process.env.BOT_TOKEN
 const url = process.env.APP_URL;
 const bot = new TelegramBot(token, botOptions)
 
-bot.deleteWebHook().then(() => {
-  bot.setWebHook(`${url}/bot${token}`).then(e => {
-    console.log(e)
+if (botOptions.polling) {
+  console.log("Polling")
+} else {
+  console.log("Webhook")
+  bot.deleteWebHook().then(() => {
+    bot.setWebHook(`${url}/bot${token}`).then(e => {
+      console.log(e)
+    })
   })
-})
-
+}
 
 function deleteProcessingMessage(chatId, messagePromise) {
   messagePromise.then(m => {
@@ -55,12 +54,13 @@ bot.onText(genericCommandMatcher, (msg, match) => {
   util[command](...params).then(r => {
     const wrapped = {result: r}
 
-    console.log(JSON.stringify(wrapped.result, null, "\t"))
+    let message = replaceAll(replaceAll(replaceAll(JSON.stringify(wrapped.result, null, "\n"), '"', ""), "{", ""), "}", "")
 
-    bot.sendMessage(chatId, JSON.stringify(wrapped.result, null, "\t")).then(() => {
+    bot.sendMessage(chatId, message).then(() => {
       deleteProcessingMessage(chatId, processingPromise)
     })
-  }).catch(() => {
+  }).catch((e) => {
+    console.log(e)
     bot.sendMessage(chatId, "Unknown command").then(() => {
       deleteProcessingMessage(chatId, processingPromise)
     })
