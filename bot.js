@@ -2,7 +2,7 @@ require("dotenv").config()
 const TelegramBot = require("node-telegram-bot-api")
 const util = require("./util")
 
-const botOptions = process.env.DEBUG.toLowerCase() === "true" ? {
+const botOptions = (process.env.DEBUG || "").toLowerCase() === "true" ? {
   polling: true
 } : {
   webHook: {
