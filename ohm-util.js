@@ -28,7 +28,7 @@ async function getQuoteFromLP(lpAddress) {
   return getQuote(1, reserve0, reserve1)
 }
 
-async function getStakingStats() {
+async function getStakingStats(address) {
   const stakingContract = new ethers.Contract("0xFd31c7d00Ca47653c6Ce64Af53c1571f9C36566a", stakingABI, provider);
   const sohmMainContract = new ethers.Contract(sOHMAddress, sOHMABI, provider);
   // Calculating staking
@@ -40,7 +40,14 @@ async function getStakingStats() {
   const fiveDayRate = Math.pow(1 + stakingRebase, 5 * 3) - 1;
   const stakingAPY = Math.pow(1 + stakingRebase, 365 * 3) - 1;
 
-  return {stakingRebase, fiveDayRate, stakingAPY}
+  let res = {stakingRebase, fiveDayRate, stakingAPY}
+
+  if (address) {
+    const ohmBalance = await getOhmBalance(address)
+    res["nextReward"] = ohmBalance * stakingRebase
+  }
+
+  return res
 }
 
 async function getOhmPrice() {
