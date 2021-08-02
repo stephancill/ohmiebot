@@ -60,6 +60,32 @@ async function getOhmPrice() {
   }
 }
 
+async function getOhmBalanceAfterDays(address, days, apy) {
+  let rebaseRate
+  if (apy) {
+    rebaseRate = Math.log(apy/100)/(3*365)
+  } else {
+    const stakingStats = await getStakingStats()
+    rebaseRate = stakingStats.stakingRebase
+    apy = Math.exp(rebaseRate * 3 * 365)*100 
+  }
+  if (!days) {
+    days = 30
+  }
+
+  const ohmBalance = await getOhmBalance(address)
+
+  return {days, apy, ohmBalance: ohmBalance * Math.pow(1+rebaseRate, days*3)}
+}
+
+async function getEthValueAfterDays(address, days, apy) {
+  const {OHM_ETH} = await getOhmPrice()
+  const balanceAfterDays = await getOhmBalanceAfterDays(address, days, apy)
+  const ethValue = OHM_ETH * balanceAfterDays.ohmBalance
+  
+  return {ethValue, ...balanceAfterDays}
+}
+
 async function getOhmBalance(address) {
   const balance = await getBalance(address, sOHMAddress)
   return balance / Math.pow(10, 9)
@@ -89,7 +115,7 @@ async function main() {
   
 }
 
-module.exports = {getStakedOhmEthValue, getStakingStats, getOhmPrice, getOhmBalance, timeUntilRebase}
+module.exports = {getStakedOhmEthValue, getStakingStats, getOhmPrice, getOhmBalance, timeUntilRebase, getOhmBalanceAfterDays, getEthValueAfterDays}
 
 // main()
 //   .then(() => process.exit(0))
