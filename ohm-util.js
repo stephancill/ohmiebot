@@ -86,6 +86,19 @@ async function getEthValueAfterDays(address, days, apy) {
   return {ethValue, ...balanceAfterDays}
 }
 
+async function daysToGetEthValue(address, ethValue) {
+  const ohmBalance = await getOhmBalance(address)
+  const {OHM_ETH} = await getOhmPrice()
+  const {stakingRebase} = await getStakingStats()
+  const requiredOhmBalance = ethValue / OHM_ETH
+  
+  const days = Math.log(requiredOhmBalance/ohmBalance) / Math.log(1+stakingRebase) / 3
+  let targetDate = new Date()
+  targetDate.setDate(targetDate.getDate() + Math.round(days))
+
+  return {ethValue, days, targetDate, ohmBalance, requiredOhmBalance, stakingRebase, OHM_ETH}
+}
+
 async function getOhmBalance(address) {
   const balance = await getBalance(address, sOHMAddress)
   return balance / Math.pow(10, 9)
@@ -109,13 +122,15 @@ async function getStakedOhmEthValue(address) {
   return ethBalance / Math.pow(10, 18)
 }
 
+
+
 async function main() {
   
   await getStakingStats()
   
 }
 
-module.exports = {getStakedOhmEthValue, getStakingStats, getOhmPrice, getOhmBalance, timeUntilRebase, getOhmBalanceAfterDays, getEthValueAfterDays}
+module.exports = {getStakedOhmEthValue, getStakingStats, getOhmPrice, getOhmBalance, timeUntilRebase, getOhmBalanceAfterDays, getEthValueAfterDays, daysToGetEthValue}
 
 // main()
 //   .then(() => process.exit(0))
