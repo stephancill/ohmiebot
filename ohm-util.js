@@ -110,6 +110,18 @@ async function daysToGetOhmBalance(address, requiredOhmBalance) {
   return {requiredOhmBalance, days, targetDate, ohmBalance, stakingRebase}
 }
 
+async function daysToGetReward(address, requiredRebaseReward) {
+  const ohmBalance = await getOhmBalance(address)
+  const {stakingRebase} = await getStakingStats()
+  const requiredOhmBalance = requiredRebaseReward / stakingRebase
+  
+  const days = Math.log(requiredOhmBalance/ohmBalance) / Math.log(1+stakingRebase) / 3
+  let targetDate = new Date()
+  targetDate.setDate(targetDate.getDate() + Math.round(days))
+
+  return {requiredRebaseReward, requiredOhmBalance, days, targetDate, ohmBalance, stakingRebase}
+}
+
 async function getOhmBalance(address) {
   const balance = await getBalance(address, sOHMAddress)
   return balance / Math.pow(10, 9)
@@ -141,7 +153,18 @@ async function main() {
   
 }
 
-module.exports = {getStakedOhmEthValue, getStakingStats, getOhmPrice, getOhmBalance, timeUntilRebase, getOhmBalanceAfterDays, getEthValueAfterDays, daysToGetEthValue, daysToGetOhmBalance}
+module.exports = {
+  getStakedOhmEthValue, 
+  getStakingStats, 
+  getOhmPrice, 
+  getOhmBalance, 
+  timeUntilRebase, 
+  getOhmBalanceAfterDays, 
+  getEthValueAfterDays, 
+  daysToGetEthValue, 
+  daysToGetOhmBalance,
+  daysToGetReward
+}
 
 // main()
 //   .then(() => process.exit(0))
