@@ -4,7 +4,7 @@ const helpers = require("./helpers")
 const LPABI = require("./abi/dai-ohm-lp.json")
 const sOHMABI = require("./abi/sohm.json")
 const stakingABI = require("./abi/staking-contract.json")
-const provider = new ethers.providers.JsonRpcProvider("https://mainnet.infura.io/v3/f29f1c340a60430ebff33f1ed9dad190")
+const {provider} = require("./util")
 const sOHMAddress = "0x04F2694C8fcee23e8Fd0dfEA1d4f5Bb8c352111F"
 
 async function getReserves(contractAddress) {

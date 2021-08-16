@@ -1,7 +1,14 @@
 require("dotenv").config()
 const replaceAll = require('string.prototype.replaceall')
 const TelegramBot = require("node-telegram-bot-api")
-const util = require("./ohm-util")
+const ohmUtil = require("./ohm-util")
+const ethUtil = require("./eth-util")
+
+
+const functions = {
+  ...ohmUtil,
+  ...ethUtil
+}
 
 const botOptions = (process.env.DEBUG || "").toLowerCase() === "true" ? {
   polling: true
@@ -40,18 +47,18 @@ bot.onText(genericCommandMatcher, (msg, match) => {
   const params = match.groups.arguments.split(" ")
   const chatId = msg.chat.id
 
-  command = Object.keys(util).find(element => element.toLowerCase() === command.toLowerCase())
+  command = Object.keys(functions).find(element => element.toLowerCase() === command.toLowerCase())
 
   if (match.groups.command.toLowerCase() === "help") {
-    bot.sendMessage(chatId, Object.keys(util).join(", "))
+    bot.sendMessage(chatId, Object.keys(functions).join(", "))
     return
-  } else if (!(command in util)) {
+  } else if (!(command in functions)) {
     return
   } 
 
   const processingPromise = bot.sendMessage(chatId, "Processing...")
 
-  util[command](...params).then(r => {
+  functions[command](...params).then(r => {
     const wrapped = {result: r}
 
     let message = replaceAll(replaceAll(replaceAll(JSON.stringify(wrapped.result, null, "\n"), '"', ""), "{", ""), "}", "")
