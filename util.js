@@ -1,5 +1,5 @@
 const {ethers} = require("ethers")
-const provider = new ethers.providers.JsonRpcProvider("https://mainnet.infura.io/v3/f29f1c340a60430ebff33f1ed9dad190")
+const provider = new ethers.providers.JsonRpcProvider(process.env.JSON_RPC_PROVIDER_URL)
 
 module.exports = {
   provider
