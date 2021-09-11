@@ -44,8 +44,12 @@ bot.onText(genericCommandMatcher, (msg, match) => {
   console.log(match.groups.command)
   
   let command = match.groups.command
-  const params = match.groups.arguments.split(" ")
+  let params = match.groups.arguments.split(" ")
   const chatId = msg.chat.id
+
+  if (params.length > 0 && params[0].indexOf("@") != -1) {
+    params.splice(0, 1)
+  }
 
   command = Object.keys(functions).find(element => element.toLowerCase() === command.toLowerCase())
 
