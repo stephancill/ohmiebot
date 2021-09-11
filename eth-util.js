@@ -26,12 +26,18 @@ async function gasPrice() {
   const transferCost = await _gasToEth(26000, price)
   const swapCost = await _gasToEth(136731, price)
   const approve = await _gasToEth(26291, price)
+  const arbitrumBridge = await _gasToEth(92000, price)
+  const optimismBridge = await _gasToEth(214000, price)
+  const polygonBridge = await _gasToEth(77257, price)
 
   return {
     gas: `${price.div(Math.pow(10, 9)).toString()} gwei`,
     transfer: ethFormatter(transferCost, usdEth),
     swap: ethFormatter(swapCost, usdEth),
-    approve: ethFormatter(approve, usdEth)
+    approve: ethFormatter(approve, usdEth),
+    arbitrumBridge: ethFormatter(arbitrumBridge, usdEth),
+    optimismBridge: ethFormatter(optimismBridge, usdEth),
+    polygonBridge: ethFormatter(polygonBridge, usdEth)
   } 
 }
 
