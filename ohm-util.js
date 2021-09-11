@@ -1,17 +1,13 @@
 const {ethers} = require("ethers")
 const helpers = require("./helpers")
 
-const LPABI = require("./abi/dai-ohm-lp.json")
 const sOHMABI = require("./abi/sohm.json")
 const stakingABI = require("./abi/staking-contract.json")
-const {provider} = require("./util")
-const sOHMAddress = "0x04F2694C8fcee23e8Fd0dfEA1d4f5Bb8c352111F"
+const {provider, getQuoteFromLP, daiEth} = require("./util")
 
-async function getReserves(contractAddress) {
-  const lp = new ethers.Contract(contractAddress, LPABI, provider)
-  const [reserve0, reserve1] = await lp.getReserves()
-  return [reserve0, reserve1]
-}
+const sOHMAddress = "0x04F2694C8fcee23e8Fd0dfEA1d4f5Bb8c352111F"
+const stakingAddress = "0xFd31c7d00Ca47653c6Ce64Af53c1571f9C36566a"
+const ohmDai = "0x34d7d7Aaf50AD4944B70B320aCB24C95fa2def7c"
 
 async function getBalance(address, contractAddress) {
   const sohm = new ethers.Contract(contractAddress, sOHMABI, provider)
@@ -19,17 +15,8 @@ async function getBalance(address, contractAddress) {
   return balance
 }
 
-function getQuote(amount, reserve0, reserve1) {
-  return amount * reserve1 / reserve0
-}
-
-async function getQuoteFromLP(lpAddress) {
-  const [reserve0, reserve1] = await getReserves(lpAddress)
-  return getQuote(1, reserve0, reserve1)
-}
-
 async function getStakingStats(address) {
-  const stakingContract = new ethers.Contract("0xFd31c7d00Ca47653c6Ce64Af53c1571f9C36566a", stakingABI, provider);
+  const stakingContract = new ethers.Contract(stakingAddress, stakingABI, provider);
   const sohmMainContract = new ethers.Contract(sOHMAddress, sOHMABI, provider);
   // Calculating staking
   const epoch = await stakingContract.epoch();
@@ -51,8 +38,8 @@ async function getStakingStats(address) {
 }
 
 async function getOhmPrice() {
-  const daiQuote = await getQuoteFromLP("0x34d7d7Aaf50AD4944B70B320aCB24C95fa2def7c")
-  const ethQuote = await getQuoteFromLP("0xc3d03e4f041fd4cd388c549ee2a29a9e5075882f")
+  const daiQuote = await getQuoteFromLP(ohmDai)
+  const ethQuote = await getQuoteFromLP(daiEth)
   // 567107172095
   return {
     OHM_DAI: daiQuote / Math.pow(10, 9),
@@ -135,8 +122,8 @@ async function timeUntilRebase() {
 }
 
 async function getStakedOhmEthValue(address) {
-  const ohmQuote = await getQuoteFromLP("0x34d7d7Aaf50AD4944B70B320aCB24C95fa2def7c")
-  const ethQuote = await getQuoteFromLP("0xc3d03e4f041fd4cd388c549ee2a29a9e5075882f")
+  const ohmQuote = await getQuoteFromLP(ohmDai)
+  const ethQuote = await getQuoteFromLP(daiEth)
   const balance = await getBalance(address, sOHMAddress)
 
   const daiBalance = balance * ohmQuote
