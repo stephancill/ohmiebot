@@ -4,6 +4,10 @@ const LPABI = require("./abi/dai-ohm-lp.json")
 const daiEth = "0xc3d03e4f041fd4cd388c549ee2a29a9e5075882f"
 const provider = new ethers.providers.JsonRpcProvider(process.env.JSON_RPC_PROVIDER_URL)
 
+async function formatUSD(value) {
+  return `$${(Math.round(value*100)/100).toLocaleString("en-US")}`
+}
+
 async function getReserves(contractAddress) {
   const lp = new ethers.Contract(contractAddress, LPABI, provider)
   const [reserve0, reserve1] = await lp.getReserves()
@@ -22,5 +26,6 @@ async function getQuoteFromLP(lpAddress) {
 module.exports = {
   provider, 
   daiEth, 
-  getQuoteFromLP
+  getQuoteFromLP,
+  formatUSD
 }

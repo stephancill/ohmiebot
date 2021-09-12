@@ -2,9 +2,11 @@ const {ethers} = require("ethers")
 const helpers = require("./helpers")
 
 const sOHMABI = require("./abi/sohm.json")
+const circulatingSupplyABI = require("./abi/circulating-supply-contract.json")
 const stakingABI = require("./abi/staking-contract.json")
-const {provider, getQuoteFromLP, daiEth} = require("./util")
+const {provider, getQuoteFromLP, daiEth, formatUSD} = require("./util")
 
+const circulatingSupplyAddress = "0x0EFFf9199Aa1Ac3C3E34E957567C1BE8bF295034"
 const sOHMAddress = "0x04F2694C8fcee23e8Fd0dfEA1d4f5Bb8c352111F"
 const stakingAddress = "0xFd31c7d00Ca47653c6Ce64Af53c1571f9C36566a"
 const ohmDai = "0x34d7d7Aaf50AD4944B70B320aCB24C95fa2def7c"
@@ -13,6 +15,14 @@ async function getBalance(address, contractAddress) {
   const sohm = new ethers.Contract(contractAddress, sOHMABI, provider)
   const balance = await sohm.balanceOf(address)
   return balance
+}
+
+async function marketCap() {
+  const circulatingSupplyContract = new ethers.Contract(circulatingSupplyAddress, circulatingSupplyABI, provider);
+  const circulatingSupply = await circulatingSupplyContract.OHMCirculatingSupply()
+  const {OHM_DAI} = await getOhmPrice()
+
+  return formatUSD(circulatingSupply * OHM_DAI / Math.pow(10, 9))
 }
 
 async function getStakingStats(address) {
@@ -150,7 +160,8 @@ module.exports = {
   getEthValueAfterDays, 
   daysToGetEthValue, 
   daysToGetOhmBalance,
-  daysToGetReward
+  daysToGetReward,
+  marketCap
 }
 
 // main()
