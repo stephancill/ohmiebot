@@ -3,11 +3,13 @@ const replaceAll = require('string.prototype.replaceall')
 const TelegramBot = require("node-telegram-bot-api")
 const ohmUtil = require("./ohm-util")
 const ethUtil = require("./eth-util")
+const klimaUtil = require("./klima-util")
 
 
 const functions = {
   ...ohmUtil,
-  ...ethUtil
+  ...ethUtil,
+  ...klimaUtil
 }
 
 const botOptions = (process.env.DEBUG || "").toLowerCase() === "true" ? {
