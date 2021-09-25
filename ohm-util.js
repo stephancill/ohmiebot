@@ -120,6 +120,9 @@ async function daysToGetReward(address, requiredRebaseReward) {
 }
 
 async function getOhmBalance(address) {
+  if (address.indexOf(".") !== -1) {
+    address = await provider.resolveName(address)
+  }
   const balance = await getBalance(address, sOHMAddress)
   return balance / Math.pow(10, 9)
 }
