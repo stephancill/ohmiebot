@@ -35,7 +35,7 @@ async function getStakingStats(address) {
   const circ = await sohmMainContract.circulatingSupply();
   const stakingRebase = stakingReward / circ;
   const fiveDayRate = Math.pow(1 + stakingRebase, 5 * 3) - 1;
-  const stakingAPY = Math.pow(1 + stakingRebase, 365 * 3) - 1;
+  const stakingAPY = (Math.pow(1 + stakingRebase, 365 * 3) - 1)*100;
 
   let res = {stakingRebase, fiveDayRate, stakingAPY}
 
