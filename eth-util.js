@@ -29,6 +29,7 @@ async function gasPrice() {
   const arbitrumBridge = await _gasToEth(92000, price)
   const optimismBridge = await _gasToEth(214000, price)
   const polygonBridge = await _gasToEth(77257, price)
+  const avalancheBridge = await _gasToEth(51630, price)
   const registerENS = await _gasToEth(46267+270896, price)
   const ensReverseRecord = await _gasToEth(127574, price) 
 
@@ -40,6 +41,7 @@ async function gasPrice() {
     arbitrumBridge: ethFormatter(arbitrumBridge, usdEth),
     optimismBridge: ethFormatter(optimismBridge, usdEth),
     polygonBridge: ethFormatter(polygonBridge, usdEth),
+    avalancheBridge: ethFormatter(avalancheBridge, usdEth),
     registerENS: ethFormatter(registerENS, usdEth),
     ensReverseRecord: ethFormatter(ensReverseRecord, usdEth)
   } 
