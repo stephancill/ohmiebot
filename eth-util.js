@@ -1,4 +1,5 @@
-const {provider, getQuoteFromLP, daiEth } = require("./util")
+const { provider, getQuoteFromLP, daiEth } = require("./util")
+const { ethers } = require("ethers")
 
 function ethFormatter(value, usd) {
   return usd ? 
@@ -14,9 +15,27 @@ async function _gasToEth(gas, price) {
 }
 
 async function gasToEth(gas, price) {
-  const usdEth = await getQuoteFromLP(daiEth)
-  const ethValue = await _gasToEth(gas, price)
-  return ethFormatter(ethValue, usdEth)
+  const usdEth = await getQuoteFromLP(daiEth);
+
+  // Show price at multiple gas prices
+  const gasPrices = [15, 20, 30].map((i) =>
+    ethers.utils.parseUnits(i.toString(), "gwei")
+  );
+  const currentGasPrice = await provider.getGasPrice();
+  gasPrices.push(currentGasPrice);
+
+  const gasMap = {gasLimit: gas}
+
+  ;(await Promise.all(
+    gasPrices.map(async (gasPrice) => {
+      const ethValue = await _gasToEth(gas, gasPrice);
+      gasMap[`${gasPrice
+        .div(Math.pow(10, 9))
+        .toString()} gwei`] = ethFormatter(ethValue, usdEth)
+    })
+  ))
+
+  return gasMap
 }
 
 async function gasPrice() {
@@ -44,7 +63,7 @@ async function gasPrice() {
     avalancheBridge: ethFormatter(avalancheBridge, usdEth),
     registerENS: ethFormatter(registerENS, usdEth),
     ensReverseRecord: ethFormatter(ensReverseRecord, usdEth)
-  } 
+  }
 }
 
 module.exports = {
